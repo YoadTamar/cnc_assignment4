@@ -35,12 +35,16 @@ void timer_callback()
 int main()
 { 
     int server_sock = 0, er = 1, client_sock = 0;
+  
     struct sockaddr_in server_addr, client_addr;
     memset(&server_addr, 0, sizeof(server_addr));
     memset(&client_addr, 0, sizeof(client_addr));
+  
     socklen_t addr_size = 0;
+  
     struct itimerval timer;
     memset(&timer, 0, sizeof(timer));
+  
     char buff[BUFSIZ] = {0};
 
     server_sock = socket(AF_INET, SOCK_STREAM, 0); // creating the listener socket
