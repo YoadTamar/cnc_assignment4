@@ -15,6 +15,7 @@
 #include <netinet/ip_icmp.h>
 #include <errno.h>
 
+#define BUF_SIZE 1024
 #define IP "127.0.0.1"
 #define PORT 3000
 #define CONNECTIONS 50
@@ -85,6 +86,7 @@ int main(int argc, char *argv[])
     while (1)
     {
         memset(buffer, '\0', BUFSIZ);
+
         sockfd = socket(AF_INET, SOCK_STREAM, 0); // creating socket for TCP communcation
         if(sock <= 0) // checking if socket created
         {
@@ -141,7 +143,6 @@ int main(int argc, char *argv[])
                 exit(errno);
             }
             
-            memset(buffer, '\0', BUFSIZ);
             if(recv(sockfd , buffer , BUFSIZ , 0) <= 0) // receiving an OK message from watchdog
             {
                 perror("recv() failed");
@@ -156,9 +157,9 @@ int main(int argc, char *argv[])
                 close(sockfd);
                 exit(EXIT_FAILURE);
             }
+            memset(buffer, '\0', BUFSIZ);
 
             addr_len = sizeof(addr_ping); // receiving ICMP-ECHO-REPLEY
-            memset(buffer, '\0', BUFSIZ);
             len = recvfrom(sock, buffer, BUFSIZ, 0, (struct sockaddr*)&addr_ping, &addr_len);
             if (len < 0) 
             {
