@@ -15,7 +15,6 @@
 #include <netinet/ip_icmp.h>
 #include <errno.h>
 
-#define BUF_SIZE 1024
 #define IP "127.0.0.1"
 #define PORT 3000
 #define CONNECTIONS 50
