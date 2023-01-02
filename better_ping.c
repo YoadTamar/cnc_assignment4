@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     struct icmphdr icmp;
     memset(&icmp, 0, sizeof(icmp));
 
-    char buf[BUFSIZ] = {'\0'}, *args[2] = {"./watchdog", NULL}, buffer[BUFSIZ] = {'\0'};
+    char *args[2] = {"./watchdog", NULL}, buffer[BUFSIZ] = {'\0'};
 
     struct timeval start , end; 
     memset(&start , 0 , sizeof(start));
@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
 
     while (1)
     {
+        memset(buffer, '\0', BUFSIZ);
         sockfd = socket(AF_INET, SOCK_STREAM, 0); // creating socket for TCP communcation
         if(sock <= 0) // checking if socket created
         {
@@ -140,6 +141,7 @@ int main(int argc, char *argv[])
                 exit(errno);
             }
             
+            memset(buffer, '\0', BUFSIZ);
             if(recv(sockfd , buffer , BUFSIZ , 0) <= 0) // receiving an OK message from watchdog
             {
                 perror("recv() failed");
@@ -156,6 +158,7 @@ int main(int argc, char *argv[])
             }
 
             addr_len = sizeof(addr_ping); // receiving ICMP-ECHO-REPLEY
+            memset(buffer, '\0', BUFSIZ);
             len = recvfrom(sock, buffer, BUFSIZ, 0, (struct sockaddr*)&addr_ping, &addr_len);
             if (len < 0) 
             {
