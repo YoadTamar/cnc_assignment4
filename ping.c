@@ -16,24 +16,6 @@
 #define MSG_LEN 32
 #define ICMP_HDRLEN 8
 
-
-// void calculate_checksum(struct icmphdr *icmp)
-// {
-//     unsigned long sum = 0;
-//     unsigned short *ptr = (unsigned short *)icmp, chksum = 0;
-
-//     for (int i = 0; i < sizeof(struct icmphdr) / 2; i++)
-//     {
-//         sum += *ptr++;
-//     }
-
-//     sum = (sum >> 16) + (sum & 0xffff);
-//     sum += (sum >> 16);
-//     chksum = ~sum;
-    
-//     icmp->checksum = chksum;
-// }
-
 unsigned short checksum(void *b, int len)
 {	unsigned short *buf = b;
 	unsigned int sum=0;
@@ -60,6 +42,7 @@ int main(int argc, char *argv[])
     memset(&icmp, 0, sizeof(icmp));
 
     char buffer[IP_MAXPACKET] = {'\0'};
+    size_t buffer_len = sizeof(buffer);
 
     struct timeval start , end; 
     memset(&start , 0 , sizeof(start));
@@ -74,7 +57,8 @@ int main(int argc, char *argv[])
 
     char packet[IP_MAXPACKET] = {0} , data[MSG_LEN] = {0};
     size_t data_len = strlen(data) + 1;
-    for (size_t i = 0; i < MSG_LEN - 1; i++)
+
+    for (size_t i = 0; i < MSG_LEN - 1; i++) //the message we sent
     {
         data[i] = '1';
     }
@@ -126,25 +110,20 @@ int main(int argc, char *argv[])
         }
 
         addr_len = sizeof(addr_ping); // receiving ICMP-ECHO-REPLEY
-
-        ssize_t bytes_received = 0;
-
         bzero(buffer, IP_MAXPACKET);
-        size_t buffer_len = sizeof(buffer);
-        while ((bytes_received = recvfrom(sock, buffer, buffer_len, 0, (struct sockaddr *)&addr_ping, &addr_len)))
+        while ((len = recvfrom(sock, buffer, buffer_len, 0, (struct sockaddr *)&addr_ping, &addr_len)))
         {
-            if (bytes_received == -1)
+            if (len == -1)
             {
-                perror("recvfrom");
-                exit(1);
+                perror("recvfrom() failed");
+                close(sock);
+                exit(errno);
             }
 
-            else if (bytes_received > 0){
+            else if (len > 0){
                 break;
             }
         }
-
-        len = bytes_received;
 
         gettimeofday(&end , NULL); // ending counting ping-time
 
